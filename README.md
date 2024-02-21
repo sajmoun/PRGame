@@ -1,2 +1,2 @@
-# prg_game
+# PRGame
 repository about my python game
