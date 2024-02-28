@@ -143,7 +143,7 @@ pygame.init()
 # Nastavení velikosti okna
 sirka, vyska = 800, 600
 okno = pygame.display.set_mode((sirka, vyska))
-pygame.display.set_caption('Vlk, slepice a včela')
+pygame.display.set_caption('Vlk, ovce a včela')
 
 hra = Hra()
 hra.spust()
