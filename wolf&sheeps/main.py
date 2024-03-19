@@ -14,7 +14,6 @@ class Vlk(pygame.sprite.Sprite):
         nova_x = self.rect.x + smer_x * self.rychlost
         nova_y = self.rect.y + smer_y * self.rychlost
 
-        # Kontrola kolize s okrajem okna
         if 0 <= nova_x <= sirka - self.rect.width and 0 <= nova_y <= vyska - self.rect.height:
             self.rect.x = nova_x
             self.rect.y = nova_y
@@ -41,8 +40,8 @@ class Ovce(pygame.sprite.Sprite):
 
     def reset(self):
         while True:
-            self.rect.x = random.randint(0, sirka - 30)
-            self.rect.y = random.randint(0, vyska - 30)
+            self.rect.x = random.randint(30, sirka - 30 - self.rect.width)
+            self.rect.y = random.randint(30, vyska - 30 - self.rect.height)
 
             if pygame.sprite.spritecollideany(self, self.vlk_skupina, pygame.sprite.collide_rect):
                 continue 
@@ -113,12 +112,10 @@ class Hra:
                 vcela.pohyb()
 
                 if pygame.sprite.collide_rect(self.vlk, vcela):
-                    print("Vcela chytla vlka!")
-                    pygame.quit()
-                    sys.exit()
+                    self.konec_hry(skore)
 
             chycene_ovce = pygame.sprite.spritecollide(self.vlk, self.ovce_skupina, True)
-            skore += len(chycene_ovce) * 10  # Přidáme skóre za každou chycenou slepici
+            skore += len(chycene_ovce) * 10  
 
             if chycene_ovce:
                 self.generuj_ovci()
@@ -128,7 +125,7 @@ class Hra:
             self.ovce_skupina.draw(okno)
             self.vcely_skupina.draw(okno)
 
-            # Výpis skóre na obrazovku
+            # Skóre
             font = pygame.font.Font(None, 36)
             text = font.render(f"Skóre: {skore}", True, (0, 0, 0))
             okno.blit(text, (10, 10))
@@ -137,13 +134,42 @@ class Hra:
 
             hodiny.tick(60)
 
-# Inicializace Pygame
+    def konec_hry(self, skore):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.__init__()
+                        self.spust()
+                    if event.key == pygame.K_q:
+                        pygame.quit()
+                        sys.exit()
+
+            okno.fill((255, 255, 255))
+            font = pygame.font.Font(None, 72)
+            text = font.render("Konec hry", True, (255, 0, 0))
+            okno.blit(text, (sirka // 2 - text.get_width() // 2, vyska // 2 - text.get_height() // 2))
+
+            font = pygame.font.Font(None, 36)
+            text = font.render(f"Skóre: {skore}", True, (0, 0, 0))
+            okno.blit(text, (sirka // 2 - text.get_width() // 2, vyska // 2 + 50))
+
+            font = pygame.font.Font(None, 24)
+            text = font.render("Stiskněte R pro restart, nebo Q pro ukončení", True, (0, 0, 0))
+            okno.blit(text, (sirka // 2 - text.get_width() // 2, vyska // 2 + 100))
+
+            pygame.display.update()
+
+
 pygame.init()
 
-# Nastavení velikosti okna
+
 sirka, vyska = 800, 600
 okno = pygame.display.set_mode((sirka, vyska))
-pygame.display.set_caption('Vlk, ovce a včela')
+pygame.display.set_caption('Vlk, slepice a včela')
 
 hra = Hra()
 hra.spust()
